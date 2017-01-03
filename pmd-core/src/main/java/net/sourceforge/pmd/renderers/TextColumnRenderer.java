@@ -11,6 +11,9 @@ import java.util.Iterator;
 import net.sourceforge.pmd.PMD;
 import net.sourceforge.pmd.RuleViolation;
 
+/**
+ * Renderer to simple text format w/ column.
+ */
 public class TextColumnRenderer extends AbstractIncrementingRenderer {
 
     public static final String NAME = "columntext";
