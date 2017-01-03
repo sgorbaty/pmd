@@ -76,16 +76,16 @@ to detect most common security problems.
 ##### ApexBadCrypto
 
 The rule makes sure you are using randomly generated IVs and keys for `Crypto` calls.
-Hard-wiring these values greatly compromise the security of encrypted data.
+Hard-wiring these values greatly compromises the security of encrypted data.
 
 For instance, it would report violations on code such as:
 
 ```
 public class without sharing Foo {
     Blob hardCodedIV = Blob.valueOf('Hardcoded IV 123');
-    Blob key = Crypto.generateAesKey(128);
+    Blob hardCodedKey = Blob.valueOf('0000000000000000');
     Blob data = Blob.valueOf('Data to be encrypted');
-    Blob encrypted = Crypto.encrypt('AES128', key, hardCodedIV, data);
+    Blob encrypted = Crypto.encrypt('AES128', hardCodedKey, hardCodedIV, data);
 }
 
 ```
@@ -93,8 +93,8 @@ public class without sharing Foo {
 ##### ApexCRUDViolation
 
 The rule validates you are checking for access permissions before a SOQL/SOSL/DML operation.
-Not having proper permissions will produce runtime errors. This check forces you to handle
-such scenarios.
+Since Apex runs in system mode not having proper permissions checks results in escalation of 
+privilege and may produce runtime errors. This check forces you to handle such scenarios.
 
 For example, the following code is considered valid:
 
@@ -136,9 +136,14 @@ public class Foo {
 
 ##### ApexDangerousMethods
 
-Checks against calling dangerous methods. For the time being, it only reports against
-`FinancialForce`'s `Configuration.disableTriggerCRUDSecurity()`. Disabling CRUD security
+Checks against calling dangerous methods.
+
+For the time being, it reports:
+
+* Against `FinancialForce`'s `Configuration.disableTriggerCRUDSecurity()`. Disabling CRUD security
 opens the door to several attacks and requires manual validation, which is unreliable.
+* Calling `System.debug` passing sensitive data as parameter, which could lead to exposure
+of private data.
 
 ##### ApexInsecureEndpoint
 
@@ -163,7 +168,7 @@ public class without sharing Foo {
 
 ##### ApexSharingViolations
 
-Detect classes declared with no explicit sharing mode if DML methods are used. This
+Detect classes declared without explicit sharing mode if DML methods are used. This
 forces the developer to take access restrictions into account before modifying objects.
 
 ##### ApexSOQLInjection
@@ -180,9 +185,25 @@ public class Foo {
 }
 ```
 
+##### ApexSuggestUsingNamedCred
+
+Detects hardcoded credentials used in requests to an endpoint.
+
+You should refrain from hardcoding credentials:
+  * They are hard to mantain by being mixed in application code
+  * Particularly hard to update them when used from different classes
+  * Granting a developer access to the codebase means granting knowledge
+     of credentials, keeping a two-level access is not possible.
+  * Using different credentials for different environments is troublesome
+     and error-prone.
+
+Instead, you should use *Named Credentials* and a callout endpoint.
+
+For more information, you can check [this](https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_callouts_named_credentials.htm)
+
 ##### ApexXSSFromEscapeFalse
 
-Reports on calls to `addError` disabling escaping. The message passed to `addError`
+Reports on calls to `addError` with disabled escaping. The message passed to `addError`
 will be displayed directly to the user in the UI, making it prime ground for XSS
 attacks if unescaped.
 
@@ -200,10 +221,12 @@ to avoid XSS attacks.
 *   Java
     *   [#1545](https://sourceforge.net/p/pmd/bugs/1545/): \[java] Symbol Table fails to resolve inner classes
 *   java-design
+    *   [#1512](https://sourceforge.net/p/pmd/bugs/1512/): \[java] Combine rules AvoidConstantsInInterface and ConstantsInInterface
     *   [#1552](https://sourceforge.net/p/pmd/bugs/1552/): \[java] MissingBreakInSwitch - False positive for continue
 *   java-imports
     *   [#1546](https://sourceforge.net/p/pmd/bugs/1546/): \[java] UnnecessaryFullyQualifiedNameRule doesn't take into consideration conflict resolution
     *   [#1547](https://sourceforge.net/p/pmd/bugs/1547/): \[java] UnusedImportRule - False Positive for only usage in Javadoc - {@link ClassName#CONSTANT}
+    *   [#1555](https://sourceforge.net/p/pmd/bugs/1555/): \[java] UnnecessaryFullyQualifiedName: Really necessary fully qualified name
 *   java-logging-java
     *   [#1541](https://sourceforge.net/p/pmd/bugs/1541/): \[java] InvalidSlf4jMessageFormat: False positive with placeholder and exception
     *   [#1551](https://sourceforge.net/p/pmd/bugs/1551/): \[java] InvalidSlf4jMessageFormat: fails with NPE
@@ -218,6 +241,9 @@ to avoid XSS attacks.
 *   `net.sourceforge.pmd.RuleSetFactory` is now immutable and its behavior cannot be changed anymore.
     It provides constructors to create new adjusted instances. This allows to avoid synchronization in RuleSetFactory.
     See [PR #131](https://github.com/pmd/pmd/pull/131).
+*   `net.sourceforge.pmd.RuleSet` is now immutable, too, and can only be created via `RuleSetFactory`.
+    See [PR #145](https://github.com/pmd/pmd/pull/145).
+*   `net.sourceforge.pmd.cli.XPathCLI` has been removed. It's functionality is fully covered by the Designer.
 
 ### External Contributions
 
@@ -232,4 +258,9 @@ to avoid XSS attacks.
 *   [#154](https://github.com/pmd/pmd/pull/154): \[java] Fix #1547: UnusedImports: Adjust regex to support underscores
 *   [#158](https://github.com/pmd/pmd/pull/158): \[apex] Reducing FPs in SOQL with VF getter methods
 *   [#160](https://github.com/pmd/pmd/pull/160): \[apex] Flagging of dangerous method call
+*   [#163](https://github.com/pmd/pmd/pull/163): \[apex] Flagging of System.debug
+*   [#165](https://github.com/pmd/pmd/pull/165): \[apex] Improving open redirect rule to avoid test classes/methods
+*   [#168](https://github.com/pmd/pmd/pull/167): \[apex] GC and thread safety changes
+*   [#169](https://github.com/pmd/pmd/pull/169): \[apex] Improving detection for DML with inline new object
+*   [#172](https://github.com/pmd/pmd/pull/172): \[apex] Bug fix, detects both Apex fields and class members
 

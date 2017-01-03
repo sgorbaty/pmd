@@ -14,11 +14,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import net.sourceforge.pmd.PMD;
-import net.sourceforge.pmd.PMDException;
 import net.sourceforge.pmd.PropertyDescriptor;
 import net.sourceforge.pmd.Report;
 import net.sourceforge.pmd.RuleContext;
 import net.sourceforge.pmd.RuleSet;
+import net.sourceforge.pmd.RuleSetFactory;
 import net.sourceforge.pmd.RuleSets;
 import net.sourceforge.pmd.RuleViolation;
 import net.sourceforge.pmd.lang.LanguageRegistry;
@@ -50,7 +50,7 @@ public class XPathRuleTest extends RuleTst {
     }
 
     @Test
-    public void testPluginname() throws PMDException {
+    public void testPluginname() throws Exception {
         rule.setXPath("//VariableDeclaratorId[string-length(@Image) < 3]");
         rule.setMessage("{0}");
         PMD p = new PMD();
@@ -58,15 +58,14 @@ public class XPathRuleTest extends RuleTst {
         Report report = new Report();
         ctx.setReport(report);
         ctx.setSourceCodeFilename("n/a");
-        RuleSet rules = new RuleSet();
-        rules.addRule(rule);
+        RuleSet rules = new RuleSetFactory().createSingleRuleRuleSet(rule);
         p.getSourceCodeProcessor().processSourceCode(new StringReader(TEST1), new RuleSets(rules), ctx);
         RuleViolation rv = report.iterator().next();
         assertEquals("a", rv.getDescription());
     }
 
     @Test
-    public void testVariables() throws PMDException {
+    public void testVariables() throws Exception {
         rule.setXPath("//VariableDeclaratorId[@Image=$var]");
         rule.setMessage("Avoid vars");
         StringProperty varDescriptor = new StringProperty("var", "Test var", null, 1.0f);
@@ -77,8 +76,7 @@ public class XPathRuleTest extends RuleTst {
         Report report = new Report();
         ctx.setReport(report);
         ctx.setSourceCodeFilename("n/a");
-        RuleSet rules = new RuleSet();
-        rules.addRule(rule);
+        RuleSet rules = new RuleSetFactory().createSingleRuleRuleSet(rule);
         p.getSourceCodeProcessor().processSourceCode(new StringReader(TEST2), new RuleSets(rules), ctx);
         RuleViolation rv = report.iterator().next();
         assertEquals(3, rv.getBeginLine());
@@ -93,7 +91,7 @@ public class XPathRuleTest extends RuleTst {
      */
     @Test
     public void testImageOfPrimarySuffix() throws Exception {
-        String SUFFIX = "import java.io.File;\n" + "\n" + "public class TestSuffix {\n"
+        final String SUFFIX = "import java.io.File;\n" + "\n" + "public class TestSuffix {\n"
                 + "    public static void main(String args[]) {\n" + "        new File(\"subdirectory\").list();\n"
                 + "    }\n" + "}";
         LanguageVersion language = LanguageRegistry.getLanguage(JavaLanguageModule.NAME).getDefaultVersion();
@@ -138,7 +136,7 @@ public class XPathRuleTest extends RuleTst {
      */
     @Test
     public void testFollowingSibling() throws Exception {
-        String SOURCE = "public class dummy {\n" + "  public String toString() {\n"
+        final String SOURCE = "public class dummy {\n" + "  public String toString() {\n"
                 + "    String test = \"bad example\";\n" + "    test = \"a\";\n" + "    return test;\n" + "  }\n" + "}";
         LanguageVersion language = LanguageRegistry.getLanguage(JavaLanguageModule.NAME).getDefaultVersion();
         ParserOptions parserOptions = language.getLanguageVersionHandler().getDefaultParserOptions();

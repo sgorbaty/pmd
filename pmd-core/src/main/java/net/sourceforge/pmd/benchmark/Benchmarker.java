@@ -43,6 +43,8 @@ public class Benchmarker {
 
     private static final Map<String, BenchmarkResult> BENCHMARKS_BY_NAME = new HashMap<>();
 
+    private Benchmarker() { }
+
     /**
      * @param args
      *            String[]
@@ -174,13 +176,13 @@ public class Benchmarker {
     private static void stress(LanguageVersion languageVersion, RuleSet ruleSet, List<DataSource> dataSources,
             Set<RuleDuration> results, boolean debug) throws PMDException, IOException {
 
-        for (Rule rule : ruleSet.getRules()) {
+        final RuleSetFactory factory = new RuleSetFactory();
+        for (Rule rule: ruleSet.getRules()) {
             if (debug) {
                 System.out.println("Starting " + rule.getName());
             }
 
-            RuleSet working = new RuleSet();
-            working.addRule(rule);
+            final RuleSet working = factory.createSingleRuleRuleSet(rule);
             RuleSets ruleSets = new RuleSets(working);
 
             PMDConfiguration config = new PMDConfiguration();

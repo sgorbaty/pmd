@@ -2,32 +2,35 @@
  * BSD-style license; for more info see http://pmd.sourceforge.net/license.html
  */
 
-package net.sourceforge.pmd.lang.plsql.symboltable;
+package net.sourceforge.pmd.lang.symboltable;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.pmd.lang.symboltable.NameDeclaration;
-import net.sourceforge.pmd.util.UnaryFunction;
+import net.sourceforge.pmd.util.SearchFunction;
 
-public class ImageFinderFunction implements UnaryFunction<NameDeclaration> {
+public class ImageFinderFunction implements SearchFunction<NameDeclaration> {
 
-    private Set<String> images = new HashSet<>();
+    private final Set<String> images;
     private NameDeclaration decl;
 
     public ImageFinderFunction(String img) {
-        images.add(img);
+        images = Collections.singleton(img);
     }
 
     public ImageFinderFunction(List<String> imageList) {
-        images.addAll(imageList);
+        images = new HashSet<>(imageList);
     }
 
-    public void applyTo(NameDeclaration nameDeclaration) {
+    @Override
+    public boolean applyTo(NameDeclaration nameDeclaration) {
         if (images.contains(nameDeclaration.getImage())) {
             decl = nameDeclaration;
+            return false;
         }
+        return true;
     }
 
     public NameDeclaration getDecl() {

@@ -227,7 +227,7 @@ public class TypeSet {
      * Resolver that uses the current package to resolve a simple class name.
      */
     public static class CurrentPackageResolver extends AbstractResolver {
-        private String pkg;
+        private final String pkg;
 
         /**
          * Creates a new {@link CurrentPackageResolver}
@@ -239,11 +239,19 @@ public class TypeSet {
          */
         public CurrentPackageResolver(PMDASMClassLoader pmdClassLoader, String pkg) {
             super(pmdClassLoader);
-            this.pkg = pkg;
+            if (pkg == null) {
+                this.pkg = null;
+            } else {
+                this.pkg = pkg + ".";
+            }
         }
 
         @Override
         public Class<?> resolve(String name) throws ClassNotFoundException {
+            if (name == null) {
+                throw new ClassNotFoundException();
+            }
+
             final String fqName = qualifyName(name);
             final Class<?> c = resolveMaybeInner(fqName, fqName);
 
@@ -264,7 +272,11 @@ public class TypeSet {
                 return name;
             }
 
-            return pkg + '.' + name;
+            /*
+             * String.concat is bad in general, but for simple 2 string concatenation, it's the fastest
+             * See http://www.rationaljava.com/2015/02/the-optimum-method-to-concatenate.html
+             */
+            return pkg.concat(name);
         }
     }
 
@@ -303,7 +315,11 @@ public class TypeSet {
                 return clazz;
             }
 
-            clazz = pmdClassLoader.loadClass("java.lang." + name);
+            /*
+             * String.concat is bad in general, but for simple 2 string concatenation, it's the fastest
+             * See http://www.rationaljava.com/2015/02/the-optimum-method-to-concatenate.html
+             */
+            clazz = pmdClassLoader.loadClass("java.lang.".concat(name));
             CLASS_CACHE.putIfAbsent(name, clazz);
 
             return clazz;
@@ -311,7 +327,11 @@ public class TypeSet {
 
         @Override
         public boolean couldResolve(String name) {
-            return super.couldResolve("java.lang." + name);
+            /*
+             * String.concat is bad in general, but for simple 2 string concatenation, it's the fastest
+             * See http://www.rationaljava.com/2015/02/the-optimum-method-to-concatenate.html
+             */
+            return super.couldResolve("java.lang.".concat(name));
         }
     }
 
@@ -331,7 +351,12 @@ public class TypeSet {
          */
         public ImportOnDemandResolver(PMDASMClassLoader pmdClassLoader, Set<String> importStmts) {
             super(pmdClassLoader);
-            this.importStmts = importStmts;
+            this.importStmts = new HashSet<>();
+            for (final String stmt : importStmts) {
+                if (stmt.endsWith("*")) {
+                    this.importStmts.add(stmt);
+                }
+            }
         }
 
         @Override
@@ -341,13 +366,11 @@ public class TypeSet {
             }
 
             for (String importStmt : importStmts) {
-                if (importStmt.endsWith("*")) {
-                    final String fqClassName = new StringBuilder(importStmt.length() + name.length()).append(importStmt)
-                            .replace(importStmt.length() - 1, importStmt.length(), name).toString();
-                    final Class<?> c = resolveMaybeInner(name, fqClassName);
-                    if (c != null) {
-                        return c;
-                    }
+                final String fqClassName = new StringBuilder(importStmt.length() + name.length()).append(importStmt)
+                        .replace(importStmt.length() - 1, importStmt.length(), name).toString();
+                final Class<?> c = resolveMaybeInner(name, fqClassName);
+                if (c != null) {
+                    return c;
                 }
             }
 
@@ -357,13 +380,11 @@ public class TypeSet {
         @Override
         public boolean couldResolve(String name) {
             for (String importStmt : importStmts) {
-                if (importStmt.endsWith("*")) {
-                    final String fqClassName = new StringBuilder(importStmt.length() + name.length()).append(importStmt)
-                            .replace(importStmt.length() - 1, importStmt.length(), name).toString();
-                    // can any class be resolved / was never attempted?
-                    if (super.couldResolve(fqClassName)) {
-                        return true;
-                    }
+                final String fqClassName = new StringBuilder(importStmt.length() + name.length()).append(importStmt)
+                        .replace(importStmt.length() - 1, importStmt.length(), name).toString();
+                // can any class be resolved / was never attempted?
+                if (super.couldResolve(fqClassName)) {
+                    return true;
                 }
             }
 
