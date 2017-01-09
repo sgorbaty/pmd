@@ -7,12 +7,15 @@ package net.sourceforge.pmd.lang.apex.rule.security;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.WeakHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import net.sourceforge.pmd.lang.apex.ast.ASTAssignmentExpression;
+import net.sourceforge.pmd.lang.apex.ast.ASTBlockStatement;
 import net.sourceforge.pmd.lang.apex.ast.ASTDmlDeleteStatement;
 import net.sourceforge.pmd.lang.apex.ast.ASTDmlInsertStatement;
 import net.sourceforge.pmd.lang.apex.ast.ASTDmlMergeStatement;
@@ -49,6 +52,7 @@ public class ApexCRUDViolationRule extends AbstractApexRule {
     private final HashMap<String, String> varToTypeMapping = new HashMap<>();
     private final ListMultimap<String, String> typeToDMLOperationMapping = ArrayListMultimap.create();
     private final HashMap<String, String> checkedTypeToDMLOperationViaESAPI = new HashMap<>();
+    private final WeakHashMap<String, ASTMethod> classMethods = new WeakHashMap<>();
 
     private static final String IS_CREATEABLE = "isCreateable";
     private static final String IS_DELETABLE = "isDeletable";
@@ -75,14 +79,44 @@ public class ApexCRUDViolationRule extends AbstractApexRule {
         setProperty(CODECLIMATE_CATEGORIES, new String[] { "Security" });
         setProperty(CODECLIMATE_REMEDIATION_MULTIPLIER, 100);
         setProperty(CODECLIMATE_BLOCK_HIGHLIGHTING, false);
+
     }
 
     @Override
     public Object visit(ASTMethodCallExpression node, Object data) {
+        performMethodLevelChecks(node);
+
+        return data;
+    }
+
+    @Override
+    public Object visit(ASTUserClass node, Object data) {
+        for (ASTMethod n : node.findDescendantsOfType(ASTMethod.class)) {
+            StringBuilder sb = new StringBuilder().append(n.getNode().getDefiningType().getApexName()).append(":").append(n.getNode().getMethodInfo().getCanonicalName()).append(":").append(n.getNode().getMethodInfo().getParameterTypes().size());
+            classMethods.put(sb.toString(), n);
+        }
+        
+        node.childrenAccept(this, data);
+        return data;
+    }
+
+    @Override
+    public Object visit(ASTDmlInsertStatement node, Object data) {
+        // need to find ASTMethodCallExpression's
+        final HashSet<ASTMethodCallExpression> prevCalls = getPreviousCalls(node);
+        for (ASTMethodCallExpression prevCall : prevCalls) {
+            performMethodLevelChecks(prevCall);
+        }
+
+        checkForCRUD(node, data, IS_CREATEABLE);
+        return data;
+    }
+
+    private void performMethodLevelChecks(ASTMethodCallExpression node) {
         final String method = node.getNode().getMethodName();
         final ASTReferenceExpression ref = node.getFirstChildOfType(ASTReferenceExpression.class);
         if (ref == null) {
-            return data;
+            return;
         }
 
         List<Identifier> a = ref.getNode().getJadtIdentifiers();
@@ -120,14 +154,35 @@ public class ApexCRUDViolationRule extends AbstractApexRule {
             }
 
         }
-
-        return data;
     }
 
-    @Override
-    public Object visit(ASTDmlInsertStatement node, Object data) {
-        checkForCRUD(node, data, IS_CREATEABLE);
-        return data;
+    private HashSet<ASTMethodCallExpression> getPreviousCalls(AbstractApexNode<?> self) {
+        final HashSet<ASTMethodCallExpression> innerMethodCalls = new HashSet<>();
+
+        ASTBlockStatement blockStatement = self.getFirstParentOfType(ASTBlockStatement.class);
+        if (blockStatement != null) {
+
+            List<ASTMethodCallExpression> nodes = blockStatement.findDescendantsOfType(ASTMethodCallExpression.class);
+            for (ASTMethodCallExpression node : nodes) {
+                if (node == self) {
+                    break;
+                }
+
+                ASTMethod methodBody = resolveMethodCalls(node);
+                if (methodBody != null) {
+                    innerMethodCalls.addAll(methodBody.findDescendantsOfType(ASTMethodCallExpression.class));
+                }
+
+            }
+
+        }
+
+        return innerMethodCalls;
+    }
+
+    private ASTMethod resolveMethodCalls(final ASTMethodCallExpression node) {
+        StringBuilder sb = new StringBuilder().append(node.getNode().getDefiningType().getApexName()).append(":").append(Helper.getMethodName(node)).append(":").append(node.getNode().getInputParameters().size());
+        return classMethods.get(sb.toString());
     }
 
     @Override
@@ -144,6 +199,14 @@ public class ApexCRUDViolationRule extends AbstractApexRule {
 
     @Override
     public Object visit(ASTDmlUpsertStatement node, Object data) {
+        
+        // need to find ASTMethodCallExpression's
+        final HashSet<ASTMethodCallExpression> prevCalls = getPreviousCalls(node);
+        for (ASTMethodCallExpression prevCall : prevCalls) {
+            performMethodLevelChecks(prevCall);
+        }
+
+        
         checkForCRUD(node, data, IS_CREATEABLE);
         checkForCRUD(node, data, IS_UPDATEABLE);
         return data;
@@ -277,8 +340,8 @@ public class ApexCRUDViolationRule extends AbstractApexRule {
         if (variable != null) {
             final String type = varToTypeMapping.get(Helper.getFQVariableName(variable));
             if (type != null) {
-                StringBuilder typeCheck = new StringBuilder().append(node.getNode().getDefiningType().getApexName()).append(":")
-                        .append(type);
+                StringBuilder typeCheck = new StringBuilder().append(node.getNode().getDefiningType().getApexName())
+                        .append(":").append(type);
 
                 validateCRUDCheckPresent(node, data, crudMethod, typeCheck.toString());
             }

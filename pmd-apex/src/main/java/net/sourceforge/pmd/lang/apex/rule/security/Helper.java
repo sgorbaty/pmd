@@ -25,6 +25,7 @@ import net.sourceforge.pmd.lang.apex.ast.ASTVariableDeclaration;
 import net.sourceforge.pmd.lang.apex.ast.ASTVariableExpression;
 import net.sourceforge.pmd.lang.apex.ast.ApexNode;
 
+import apex.jorje.data.ast.Identifier;
 import apex.jorje.data.ast.TypeRef.ClassTypeRef;
 import apex.jorje.semantic.ast.expression.MethodCallExpression;
 import apex.jorje.semantic.ast.expression.NewNameValueObjectExpression;
@@ -134,6 +135,32 @@ public final class Helper {
         }
 
         return false;
+
+    }
+
+    static String getMethodName(final ASTMethodCallExpression node) {
+        String methodName = node.getNode().getMethodName();
+
+        final ASTReferenceExpression reference = node.getFirstChildOfType(ASTReferenceExpression.class);
+        if (reference != null) {
+            final ASTDottedExpression dottedExpression = reference.getFirstChildOfType(ASTDottedExpression.class);
+            if (dottedExpression != null) {
+                final ASTMethodCallExpression nestedMethod = dottedExpression
+                        .getFirstChildOfType(ASTMethodCallExpression.class);
+                if (nestedMethod != null) {
+                    methodName = getMethodName(nestedMethod) + "()." + methodName;
+                } else {
+                    List<Identifier> list = reference.getNode().getJadtIdentifiers();
+                    for (Identifier id : list) {
+                        methodName = id.value + "." + methodName;
+                    }
+                            
+                }
+            }
+
+        }
+
+        return methodName;
     }
 
     static String getFQVariableName(final ASTVariableExpression variable) {

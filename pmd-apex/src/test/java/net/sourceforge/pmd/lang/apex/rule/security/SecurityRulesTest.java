@@ -12,15 +12,15 @@ public class SecurityRulesTest extends SimpleAggregatorTst {
 
     @Override
     public void setUp() {
-        addRule(RULESET, "ApexBadCrypto");
-        addRule(RULESET, "ApexXSSFromEscapeFalse");
-        addRule(RULESET, "ApexXSSFromURLParam");
-        addRule(RULESET, "ApexCSRF");
-        addRule(RULESET, "ApexOpenRedirect");
-        addRule(RULESET, "ApexSOQLInjection");
-        addRule(RULESET, "ApexSharingViolations");
-        addRule(RULESET, "ApexInsecureEndpoint");
+//        addRule(RULESET, "ApexBadCrypto");
+//        addRule(RULESET, "ApexXSSFromEscapeFalse");
+//        addRule(RULESET, "ApexXSSFromURLParam");
+//        addRule(RULESET, "ApexCSRF");
+//        addRule(RULESET, "ApexOpenRedirect");
+//        addRule(RULESET, "ApexSOQLInjection");
+//        addRule(RULESET, "ApexSharingViolations");
+//        addRule(RULESET, "ApexInsecureEndpoint");
         addRule(RULESET, "ApexCRUDViolation");
-        addRule(RULESET, "ApexDangerousMethods");
+//        addRule(RULESET, "ApexDangerousMethods");
     }
 }

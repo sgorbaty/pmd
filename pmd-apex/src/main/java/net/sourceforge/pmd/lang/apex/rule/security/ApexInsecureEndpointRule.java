@@ -55,6 +55,12 @@ public class ApexInsecureEndpointRule extends AbstractApexRule {
         return data;
     }
 
+    @Override
+    public Object visit(ASTMethodCallExpression node, Object data) {
+        processInsecureEndpoint(node, data);
+        return data;
+    }
+
     private void findInsecureEndpoints(AbstractApexNode<?> node, Object data) {
         ASTVariableExpression variableNode = node.getFirstChildOfType(ASTVariableExpression.class);
         findInnerInsecureEndpoints(node, variableNode);
@@ -78,12 +84,6 @@ public class ApexInsecureEndpointRule extends AbstractApexRule {
                 }
             }
         }
-    }
-
-    @Override
-    public Object visit(ASTMethodCallExpression node, Object data) {
-        processInsecureEndpoint(node, data);
-        return data;
     }
 
     private void processInsecureEndpoint(ASTMethodCallExpression node, Object data) {

@@ -41,6 +41,7 @@ public class ApexBadCryptoRule extends AbstractApexRule {
 
     @Override
     public Object visit(ASTUserClass node, Object data) {
+        
         if (Helper.isTestMethodOrClass(node)) {
             return data;
         }

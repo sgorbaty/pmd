@@ -208,4 +208,19 @@ public class Foo {
         </example>
 	</rule>
 
+	<rule name="ApexCFGBuilder" since="5.5.3"
+		message="Calling potentially dangerous method"
+		class="net.sourceforge.pmd.lang.apex.rule.security.ApexCFGBuilder"
+		externalInfoUrl="${pmd.website.baseurl}/rules/apex/security.html#ApexCFGBuilder">
+		<description>
+            
+        </description>
+		<priority>3</priority>
+		<example>
+            <![CDATA[
+
+    ]]>
+        </example>
+	</rule>
+
 </ruleset>

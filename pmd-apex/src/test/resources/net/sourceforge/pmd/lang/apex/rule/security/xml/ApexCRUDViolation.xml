@@ -2,6 +2,26 @@
 
 <test-data>
 
+<test-code>
+		<description>Proper CRUD,FLS via upsert</description>
+		<expected-problems>0</expected-problems>
+		<code><![CDATA[ 
+public class Foo { 
+	public void foo(String newName, String tempID) { 
+			doChecksDummy();
+			doChecks();
+			upsert new Contact(FirstName = 'First', LastName = 'Last', Phone = '414-414-4414');
+		
+	} 
+	
+	public void doChecks() {
+		if (!Contact.sObjectType.getDescribe().isCreateable() && !Contact.sObjectType.getDescribe().isUpdateable()) {
+			throw new NoAccessException();
+		}
+	}
+	
+} ]]></code>
+	</test-code>
 	<test-code>
 		<description>Proper CRUD,FLS via upsert</description>
 		<expected-problems>0</expected-problems>
@@ -467,5 +487,5 @@ public class Foo {
 	}
 }
 		]]></code>
-	</test-code>
+	</test-code> 
 </test-data>
