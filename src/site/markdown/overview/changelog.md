@@ -223,6 +223,8 @@ to avoid XSS attacks.
 *   java-design
     *   [#1512](https://sourceforge.net/p/pmd/bugs/1512/): \[java] Combine rules AvoidConstantsInInterface and ConstantsInInterface
     *   [#1552](https://sourceforge.net/p/pmd/bugs/1552/): \[java] MissingBreakInSwitch - False positive for continue
+    *   [#1556](https://sourceforge.net/p/pmd/bugs/1556/): \[java] UseLocaleWithCaseConversions does not works with `ResultSet` (false negative)
+    *   [#177](https://github.com/pmd/pmd/issues/177): \[java] SingularField with lambdas as final fields
 *   java-imports
     *   [#1546](https://sourceforge.net/p/pmd/bugs/1546/): \[java] UnnecessaryFullyQualifiedNameRule doesn't take into consideration conflict resolution
     *   [#1547](https://sourceforge.net/p/pmd/bugs/1547/): \[java] UnusedImportRule - False Positive for only usage in Javadoc - {@link ClassName#CONSTANT}
@@ -262,6 +264,11 @@ to avoid XSS attacks.
 *   [#165](https://github.com/pmd/pmd/pull/165): \[apex] Improving open redirect rule to avoid test classes/methods
 *   [#167](https://github.com/pmd/pmd/pull/167): \[apex] GC and thread safety changes
 *   [#169](https://github.com/pmd/pmd/pull/169): \[apex] Improving detection for DML with inline new object
+*   [#170](https://github.com/pmd/pmd/pull/170): \[core] Ant Task Formatter encoding issue with XMLRenderer
 *   [#172](https://github.com/pmd/pmd/pull/172): \[apex] Bug fix, detects both Apex fields and class members
 *   [#175](https://github.com/pmd/pmd/pull/175): \[apex] ApexXSSFromURLParam: Adding missing casting methods
+*   [#176](https://github.com/pmd/pmd/pull/176): \[apex] Bug fix for FP: open redirect for strings prefixed with / is safe
+*   [#179](https://github.com/pmd/pmd/pull/179): \[apex] Legacy test class declaration support
+*   [#181](https://github.com/pmd/pmd/pull/181): \[apex] Control flow based CRUD rule checking
+*   [#184](https://github.com/pmd/pmd/pull/184): \[apex] Improving open redirect detection for static fields & assignment operations
 
