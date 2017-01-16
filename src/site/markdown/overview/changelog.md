@@ -218,6 +218,8 @@ to avoid XSS attacks.
     *   [#1542](https://sourceforge.net/p/pmd/bugs/1542/): \[java] CPD throws an NPE when parsing enums with -ignore-identifiers
 *   apex-apexunit
     *   [#1543](https://sourceforge.net/p/pmd/bugs/1543/): \[apex] ApexUnitTestClassShouldHaveAsserts assumes APEX is case sensitive
+*   apex-complexity
+    *   [#183](https://github.com/pmd/pmd/issues/183): \[apex] NCSS Method length is incorrect when using method chaining
 *   Java
     *   [#1545](https://sourceforge.net/p/pmd/bugs/1545/): \[java] Symbol Table fails to resolve inner classes
 *   java-design
@@ -271,4 +273,5 @@ to avoid XSS attacks.
 *   [#179](https://github.com/pmd/pmd/pull/179): \[apex] Legacy test class declaration support
 *   [#181](https://github.com/pmd/pmd/pull/181): \[apex] Control flow based CRUD rule checking
 *   [#184](https://github.com/pmd/pmd/pull/184): \[apex] Improving open redirect detection for static fields & assignment operations
+*   [#189](https://github.com/pmd/pmd/pull/189): \[apex] Bug fix of SOQL concatenated vars detection
 
