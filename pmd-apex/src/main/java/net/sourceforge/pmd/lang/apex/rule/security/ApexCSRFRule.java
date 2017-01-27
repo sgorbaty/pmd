@@ -21,13 +21,16 @@ public class ApexCSRFRule extends AbstractApexRule {
         setProperty(CODECLIMATE_CATEGORIES, new String[] { "Security" });
         setProperty(CODECLIMATE_REMEDIATION_MULTIPLIER, 100);
         setProperty(CODECLIMATE_BLOCK_HIGHLIGHTING, false);
+        setUsesDFA();
     }
 
     @Override
     public Object visit(ASTMethod node, Object data) {
+
         if (!Helper.isTestMethodOrClass(node)) {
             checkForCSRF(node, data);
         }
+
         return data;
     }
 

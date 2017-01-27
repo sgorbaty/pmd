@@ -7,6 +7,7 @@ package net.sourceforge.pmd.lang.apex;
 import java.io.Writer;
 
 import net.sourceforge.pmd.lang.AbstractLanguageVersionHandler;
+import net.sourceforge.pmd.lang.DataFlowHandler;
 import net.sourceforge.pmd.lang.Parser;
 import net.sourceforge.pmd.lang.ParserOptions;
 import net.sourceforge.pmd.lang.VisitorStarter;
@@ -16,6 +17,8 @@ import net.sourceforge.pmd.lang.apex.ast.DumpFacade;
 import net.sourceforge.pmd.lang.apex.rule.ApexRuleViolationFactory;
 import net.sourceforge.pmd.lang.ast.Node;
 import net.sourceforge.pmd.lang.ast.xpath.AbstractASTXPathHandler;
+import net.sourceforge.pmd.lang.apex.dfa.ApexCFGHandler;
+import net.sourceforge.pmd.lang.apex.dfa.CFGFacade;
 import net.sourceforge.pmd.lang.rule.RuleViolationFactory;
 
 import net.sf.saxon.sxpath.IndependentContext;
@@ -38,12 +41,26 @@ public class ApexHandler extends AbstractLanguageVersionHandler {
     }
 
     @Override
+    public DataFlowHandler getDataFlowHandler() {
+        return new ApexCFGHandler();
+    }
+
+    @Override
     public ParserOptions getDefaultParserOptions() {
         return new ApexParserOptions();
     }
 
     public Parser getParser(ParserOptions parserOptions) {
         return new ApexParser(parserOptions);
+    }
+
+    @Override
+    public VisitorStarter getDataFlowFacade() {
+        return new VisitorStarter() {
+            public void start(Node rootNode) {
+                new CFGFacade().initializeWith(getDataFlowHandler(), (ApexNode<?>) rootNode);
+            }
+        };
     }
 
     @Override
