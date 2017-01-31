@@ -136,6 +136,27 @@ public class ParserCornersTest extends ParserTst {
         String c = IOUtils.toString(this.getClass().getResourceAsStream("Bug1530.java"));
         parseJava18(c);
     }
+    
+    @Test
+    public void testGitHubBug207() throws Exception {
+        String c = IOUtils.toString(this.getClass().getResourceAsStream("GitHubBug207.java"));
+        parseJava18(c);
+    }
+
+    @Test
+    public void testBug206() throws Exception {
+        String code = "public @interface Foo {" + PMD.EOL
+            + "static final ThreadLocal<Interner<Integer>> interner =" + PMD.EOL
+            + "    ThreadLocal.withInitial(Interners::newStrongInterner);" + PMD.EOL
+            + "}";
+        parseJava18(code);
+    }
+
+    @Test
+    public void testGitHubBug208ParseError() throws Exception {
+        String c = IOUtils.toString(this.getClass().getResourceAsStream("GitHubBug208.java"));
+        parseJava15(c);
+    }
 
     /**
      * This triggered bug #1484 UnusedLocalVariable - false positive -
