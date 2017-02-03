@@ -1,4 +1,19 @@
 /**
+ * Allow local classes to carry more than one annotation.
+ * Bug #208
+ *
+ * Juan Martin Sotuyo Dodero 01/2017
+ *====================================================================
+ * Change lookahead for AnnotationMethodDeclaration in AnnotationTypeMemberDeclaration.
+ * Bug #206
+ *
+ * Juan Martin Sotuyo Dodero 01/2017
+ *====================================================================
+ * Allow method references to specify generics.
+ * Bug #207
+ *
+ * Juan Martin Sotuyo Dodero 01/2017
+ *====================================================================
  * Simplify VariableDeclaratorId, forbidding illegal sequences such as
  * this[] and MyClass.this[]
  *
@@ -1812,7 +1827,7 @@ Token t;
 void MethodReference() :
 {Token t; checkForBadMethodReferenceUsage();}
 {
-  "::" ("new" {jjtThis.setImage("new");} | t=<IDENTIFIER> {jjtThis.setImage(t.image);} )
+  "::" ("new" {jjtThis.setImage("new");} | [TypeArguments()] t=<IDENTIFIER> {jjtThis.setImage(t.image);} )
 }
 
 void PrimaryPrefix() :
@@ -1970,7 +1985,7 @@ void BlockStatement():
   ClassOrInterfaceDeclaration, but that seems like a hack that
   could break other things...
   */
-  LOOKAHEAD( [Annotation()] ["final"|"abstract"] "class") [Annotation()] ClassOrInterfaceDeclaration(0)
+  LOOKAHEAD( (Annotation())* ["final"|"abstract"] "class") (Annotation())* ClassOrInterfaceDeclaration(0)
 }
 
 void LocalVariableDeclaration() :
@@ -2279,7 +2294,7 @@ void AnnotationTypeMemberDeclaration():
 {
  modifiers = Modifiers()
  (
-   LOOKAHEAD(3) AnnotationMethodDeclaration(modifiers)
+   LOOKAHEAD(Type() <IDENTIFIER> "(") AnnotationMethodDeclaration(modifiers)
   |
    ClassOrInterfaceDeclaration(modifiers)
   |

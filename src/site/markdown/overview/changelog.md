@@ -30,6 +30,7 @@ making it over 500X faster, and `PreserveStackTrace` which is now 7X faster.
 * [New and noteworthy](#New_and_noteworthy)
     * [Incremental Analysis](#Incremental_Analysis)
     * [Apex Security Rule Set](#Apex_Security_Rule_Set)
+    * [Modified Rules](#Modified_Rules)
 * [Fixed Issues](#Fixed_Issues)
 * [API Changes](#API_Changes)
 * [External Contributions](#External_Contributions)
@@ -212,17 +213,37 @@ attacks if unescaped.
 Makes sure that all values obtained from URL parameters are properly escaped / sanitized
 to avoid XSS attacks.
 
+
+#### Modified Rules
+
+*   The Java rule "UseLocaleWithCaseConversions" (ruleset java-design) has been modified, to detect calls
+    to `toLowerCase` and to `toUpperCase` also within method call chains. This leads to more detected cases
+    and potentially new false positives.
+    See also [bugfix #1556](https://sourceforge.net/p/pmd/bugs/1556/).
+
+*   The rule `AvoidConstantsInterface` (ruleset java-design) has been removed. It is completely replaced by
+    the rule `ConstantsInInterface`.
+
+
 ### Fixed Issues
 
 *   General
-    *   [#1542](https://sourceforge.net/p/pmd/bugs/1542/): \[java] CPD throws an NPE when parsing enums with -ignore-identifiers
+    *   [#1511](https://sourceforge.net/p/pmd/bugs/1511/): \[core] Inconsistent behavior of Rule.start/Rule.end
 *   apex-apexunit
     *   [#1543](https://sourceforge.net/p/pmd/bugs/1543/): \[apex] ApexUnitTestClassShouldHaveAsserts assumes APEX is case sensitive
 *   apex-complexity
     *   [#183](https://github.com/pmd/pmd/issues/183): \[apex] NCSS Method length is incorrect when using method chaining
-*   Java
+*   java
+    *   [#185](https://github.com/pmd/pmd/issues/185): \[java] CPD runs into NPE when analyzing Lucene
+    *   [#206](https://github.com/pmd/pmd/issues/206): \[java] Parse error on annotation fields with generics
+    *   [#207](https://github.com/pmd/pmd/issues/207): \[java] Parse error on method reference with generics
+    *   [#208](https://github.com/pmd/pmd/issues/208): \[java] Parse error with local class with 2 or more annotations
+    *   [#213](https://github.com/pmd/pmd/issues/213): \[java] CPD: OutOfMemory when analyzing Lucene
+    *   [#1542](https://sourceforge.net/p/pmd/bugs/1542/): \[java] CPD throws an NPE when parsing enums with -ignore-identifiers
     *   [#1545](https://sourceforge.net/p/pmd/bugs/1545/): \[java] Symbol Table fails to resolve inner classes
 *   java-design
+    *   [#1448](https://sourceforge.net/p/pmd/bugs/1448/): \[java] ImmutableField: Private field in inner class gives false positive with lambdas
+    *   [#1495](https://sourceforge.net/p/pmd/bugs/1495/): \[java] UnnecessaryLocalBeforeReturn with assert
     *   [#1512](https://sourceforge.net/p/pmd/bugs/1512/): \[java] Combine rules AvoidConstantsInInterface and ConstantsInInterface
     *   [#1552](https://sourceforge.net/p/pmd/bugs/1552/): \[java] MissingBreakInSwitch - False positive for continue
     *   [#1556](https://sourceforge.net/p/pmd/bugs/1556/): \[java] UseLocaleWithCaseConversions does not works with `ResultSet` (false negative)
@@ -234,10 +255,16 @@ to avoid XSS attacks.
 *   java-logging-java
     *   [#1541](https://sourceforge.net/p/pmd/bugs/1541/): \[java] InvalidSlf4jMessageFormat: False positive with placeholder and exception
     *   [#1551](https://sourceforge.net/p/pmd/bugs/1551/): \[java] InvalidSlf4jMessageFormat: fails with NPE
+*   java-unnecessary
+    *   [#199](https://github.com/pmd/pmd/issues/199): \[java] UselessParentheses: Parentheses in return statement are incorrectly reported as useless
+*   java-strings
+    *   [#202](https://github.com/pmd/pmd/issues/202): \[java] \[doc] ConsecutiveAppendsShouldReuse is not really an optimization
 *   XML
     *   [#1518](https://sourceforge.net/p/pmd/bugs/1518/): \[xml] Error while processing xml file with ".webapp" in the file or directory name
 *   psql
     *   [#1549](https://sourceforge.net/p/pmd/bugs/1549/): \[plsql] Parse error for IS [NOT] NULL construct
+*   javascript
+    *   [#201](https://github.com/pmd/pmd/issues/201): \[javascript] template strings are not correctly parsed
 
 
 ### API Changes
@@ -276,4 +303,12 @@ to avoid XSS attacks.
 *   [#189](https://github.com/pmd/pmd/pull/189): \[apex] Bug fix of SOQL concatenated vars detection
 *   [#191](https://github.com/pmd/pmd/pull/191): \[apex] Detection of sharing violation when Database. methods are used
 *   [#192](https://github.com/pmd/pmd/pull/192): \[apex] Dead code removal
+*   [#200](https://github.com/pmd/pmd/pull/200): \[javascript] Templatestring grammar fix
+*   [#204](https://github.com/pmd/pmd/pull/204): \[apex] Sharing violation SOQL detection bug fix
+*   [#214](https://github.com/pmd/pmd/pull/214): \[apex] Sharing violation improving reporting of the correct node, de-duping
+*   [#217](https://github.com/pmd/pmd/pull/217): \[core] Make it build on Windows
+*   [#227](https://github.com/pmd/pmd/pull/227): \[apex] Improving detection of getters
+*   [#228](https://github.com/pmd/pmd/pull/228): \[apex] Excluding count from CRUD/FLS checks
+*   [#229](https://github.com/pmd/pmd/pull/229): \[apex] Dynamic SOQL is safe against Integer, Boolean, Double
+*   [#231](https://github.com/pmd/pmd/pull/231): \[apex] CRUD/FLS rule - add support for fields
 

@@ -4,6 +4,7 @@
 
 package net.sourceforge.pmd.lang.apex.rule.security;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,10 +27,12 @@ import net.sourceforge.pmd.lang.apex.ast.ASTDmlUpsertStatement;
 import net.sourceforge.pmd.lang.apex.ast.ASTDottedExpression;
 import net.sourceforge.pmd.lang.apex.ast.ASTField;
 import net.sourceforge.pmd.lang.apex.ast.ASTFieldDeclaration;
+import net.sourceforge.pmd.lang.apex.ast.ASTFieldDeclarationStatements;
 import net.sourceforge.pmd.lang.apex.ast.ASTIfElseBlockStatement;
 import net.sourceforge.pmd.lang.apex.ast.ASTMethod;
 import net.sourceforge.pmd.lang.apex.ast.ASTMethodCallExpression;
 import net.sourceforge.pmd.lang.apex.ast.ASTNewNameValueObjectExpression;
+import net.sourceforge.pmd.lang.apex.ast.ASTParameter;
 import net.sourceforge.pmd.lang.apex.ast.ASTProperty;
 import net.sourceforge.pmd.lang.apex.ast.ASTReferenceExpression;
 import net.sourceforge.pmd.lang.apex.ast.ASTReturnStatement;
@@ -42,6 +45,7 @@ import net.sourceforge.pmd.lang.apex.rule.AbstractApexRule;
 import net.sourceforge.pmd.lang.ast.Node;
 
 import apex.jorje.data.ast.Identifier;
+import apex.jorje.data.ast.TypeRef;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 
@@ -162,6 +166,25 @@ public class ApexCRUDViolationRule extends AbstractApexRule {
 
     @Override
     public Object visit(final ASTFieldDeclaration node, Object data) {
+        ASTFieldDeclarationStatements field = node.getFirstParentOfType(ASTFieldDeclarationStatements.class);
+        if (field != null) {
+            try {
+                TypeRef a = field.getNode().getTypeName();
+                Field f = a.getClass().getDeclaredField("className");
+                f.setAccessible(true);
+                if (f.get(a) instanceof ArrayList<?>) {
+                    @SuppressWarnings("unchecked")
+                    ArrayList<Identifier> innerField = (ArrayList<Identifier>) f.get(a);
+                    if (!innerField.isEmpty()) {
+                        String type = innerField.get(0).value;
+                        addVariableToMapping(Helper.getFQVariableName(node), type);
+                    }
+                }
+
+            } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException | SecurityException e) {
+            }
+
+        }
         final ASTSoqlExpression soql = node.getFirstChildOfType(ASTSoqlExpression.class);
         if (soql != null) {
             checkForAccessibility(soql, data);
@@ -456,6 +479,8 @@ public class ApexCRUDViolationRule extends AbstractApexRule {
     }
 
     private void checkForAccessibility(final ASTSoqlExpression node, Object data) {
+        final boolean isCount = node.getNode().getCanonicalQuery().startsWith("SELECT COUNT()");
+
         final HashSet<ASTMethodCallExpression> prevCalls = getPreviousMethodCalls(node);
         for (ASTMethodCallExpression prevCall : prevCalls) {
             collectCRUDMethodLevelChecks(prevCall);
@@ -467,7 +492,7 @@ public class ApexCRUDViolationRule extends AbstractApexRule {
         final ASTMethod wrappingMethod = node.getFirstParentOfType(ASTMethod.class);
         final ASTUserClass wrappingClass = node.getFirstParentOfType(ASTUserClass.class);
 
-        if ((wrappingClass != null && Helper.isTestMethodOrClass(wrappingClass))
+        if (isCount || (wrappingClass != null && Helper.isTestMethodOrClass(wrappingClass))
                 || (wrappingMethod != null && Helper.isTestMethodOrClass(wrappingMethod))) {
             return;
         }
@@ -522,7 +547,8 @@ public class ApexCRUDViolationRule extends AbstractApexRule {
         final boolean startsWithGet = method.getNode().getMethodInfo().getCanonicalName().startsWith("get");
         final boolean voidOrString = VOID_OR_STRING_PATTERN
                 .matcher(method.getNode().getMethodInfo().getEmitSignature().getReturnType().getApexName()).matches();
+        final boolean noParams = method.findChildrenOfType(ASTParameter.class).isEmpty();
 
-        return (startsWithGet && !voidOrString);
+        return (startsWithGet && noParams && !voidOrString);
     }
 }

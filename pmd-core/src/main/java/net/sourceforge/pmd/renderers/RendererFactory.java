@@ -34,7 +34,6 @@ public class RendererFactory {
         map.put(IDEAJRenderer.NAME, IDEAJRenderer.class);
         map.put(TextColorRenderer.NAME, TextColorRenderer.class);
         map.put(TextRenderer.NAME, TextRenderer.class);
-        map.put(TextColumnRenderer.NAME, TextColumnRenderer.class);
         map.put(TextPadRenderer.NAME, TextPadRenderer.class);
         map.put(EmacsRenderer.NAME, EmacsRenderer.class);
         map.put(CSVRenderer.NAME, CSVRenderer.class);
@@ -46,7 +45,8 @@ public class RendererFactory {
         REPORT_FORMAT_TO_RENDERER = Collections.unmodifiableMap(map);
     }
 
-    private RendererFactory() { }
+    private RendererFactory() {
+    }
 
     /**
      * Construct an instance of a Renderer based on report format name.

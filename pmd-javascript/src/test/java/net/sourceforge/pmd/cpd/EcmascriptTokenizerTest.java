@@ -110,4 +110,36 @@ public class EcmascriptTokenizerTest {
         sb.append("}").append(PMD.EOL);
         return sb.toString();
     }
+
+    @Test
+    public void testTemplateStrings() throws IOException {
+        Tokenizer t = new EcmascriptTokenizer();
+        SourceCode sourceCode = new SourceCode(new SourceCode.StringCodeLoader(
+                  "export default class DrawLocation extends joint.shapes.basic.Generic {" + PMD.EOL
+                + "  constructor(location: ILocation) {" + PMD.EOL
+                + "    this.markup = `<g>" + PMD.EOL
+                + "        <path class=\"location\"/>" + PMD.EOL
+                + "        <text x=\"0\" y=\"0\" text-anchor=\"middle\" class=\"location-text\"></text>" + PMD.EOL
+                + PMD.EOL
+                + "        <path class=\"location\"/>" + PMD.EOL
+                + "        <circle class=\"location-circle\"/>" + PMD.EOL
+                + "        ${drawIndicators.Check.markup}" + PMD.EOL
+                + PMD.EOL
+                + "      </g>`;" + PMD.EOL
+                + "  }" + PMD.EOL
+                + "" + PMD.EOL
+                + "}"));
+        final Tokens tokens = new Tokens();
+        t.tokenize(sourceCode, tokens);
+        final String templateString = "`<g>" + PMD.EOL
+                + "        <path class=\"location\"/>" + PMD.EOL
+                + "        <text x=\"0\" y=\"0\" text-anchor=\"middle\" class=\"location-text\"></text>" + PMD.EOL
+                + PMD.EOL
+                + "        <path class=\"location\"/>" + PMD.EOL
+                + "        <circle class=\"location-circle\"/>" + PMD.EOL
+                + "        ${drawIndicators.Check.markup}" + PMD.EOL
+                + PMD.EOL
+                + "      </g>`";
+        assertEquals(templateString, tokens.getTokens().get(24).toString());
+    }
 }
