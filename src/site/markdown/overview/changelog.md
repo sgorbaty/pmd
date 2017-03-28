@@ -33,9 +33,11 @@ making it over 500X faster, and `PreserveStackTrace` which is now 7X faster.
     *   [Visualforce Support](#Visualforce_support)
     *   [Apex Security Rule Set](#Apex_Security_Rule_Set)
     *   [Apex Braces Rule Set](#Apex_Braces_Rule_Set)
+    *   [Apex Rule Suppression](#Apex_Rule_Suppression)
     *   [New Rules](#New_Rules)
     *   [Modified Rules](#Modified_Rules)
     *   [CPD Suppression](#CPD_Suppression)
+    *   [CPD filelist command line option)(#CPD_filelist_command_line_option)
 *   [Fixed Issues](#Fixed_Issues)
 *   [API Changes](#API_Changes)
 *   [External Contributions](#External_Contributions)
@@ -314,6 +316,22 @@ for (int i = 0; i < 42; i++) { // preferred approach
 }
 ```
 
+#### Apex Rule Suppression
+
+Apex violations can now be suppressed very similarly to how it's done in Java, by making use of a
+`@SuppressWarnings` annotation.
+
+Supported syntax includes:
+
+```
+@SupressWarnings('PMD') // to supress all Apex rules
+@SupressWarnings('all') // to supress all Apex rules
+@SupressWarnings('PMD.ARuleName') // to supress only the rule named ARuleName
+@SupressWarnings('PMD.ARuleName, PMD.AnotherRuleName') // to supress only the rule named ARuleName or AnotherRuleName
+```
+
+Notice this last scenario is slightly different to the Java syntax. This is due to differences in the Apex grammar for annotations.
+
 #### New Rules
 
 ##### AccessorMethodGeneration (java-design)
@@ -394,12 +412,20 @@ For example:
     }
 ```
 
+#### CPD filelist command line option
+
+CPD now supports the command line option `--filelist`. With that, you can specify a file, which
+contains the names and paths of the files, that should be analyzed. This is similar to PMD's filelist option.
+You need to use this, if you have a large project with many files, and you hit the command line length limit.
+
+
 ### Fixed Issues
 
 *   General
     *   [#1511](https://sourceforge.net/p/pmd/bugs/1511/): \[core] Inconsistent behavior of Rule.start/Rule.end
     *   [#234](https://github.com/pmd/pmd/issues/234): \[core] Zip file stream closes spuriously when loading rulesets
     *   [#256](https://github.com/pmd/pmd/issues/256): \[core] shortnames option is broken with relative paths
+    *   [#305](https://github.com/pmd/pmd/issues/305): \[core] PMD not executing under git bash
 *   apex-apexunit
     *   [#1543](https://sourceforge.net/p/pmd/bugs/1543/): \[apex] ApexUnitTestClassShouldHaveAsserts assumes APEX is case sensitive
 *   apex-complexity
@@ -413,6 +439,7 @@ For example:
     *   [#207](https://github.com/pmd/pmd/issues/207): \[java] Parse error on method reference with generics
     *   [#208](https://github.com/pmd/pmd/issues/208): \[java] Parse error with local class with 2 or more annotations
     *   [#213](https://github.com/pmd/pmd/issues/213): \[java] CPD: OutOfMemory when analyzing Lucene
+    *   [#309](https://github.com/pmd/pmd/issues/309): \[java] Parse error on method reference
     *   [#1542](https://sourceforge.net/p/pmd/bugs/1542/): \[java] CPD throws an NPE when parsing enums with -ignore-identifiers
     *   [#1545](https://sourceforge.net/p/pmd/bugs/1545/): \[java] Symbol Table fails to resolve inner classes
 *   java-basic
@@ -433,17 +460,23 @@ For example:
     *   [#240](https://github.com/pmd/pmd/issues/240): \[java] UnnecessaryLocalBeforeReturn: Enhance by checking usages
     *   [#274](https://github.com/pmd/pmd/issues/274): \[java] AccessorMethodGeneration: Method inside static inner class incorrectly reported
     *   [#275](https://github.com/pmd/pmd/issues/275): \[java] FinalFieldCouldBeStatic: Constant in @interface incorrectly reported as "could be made static"
+    *   [#282](https://github.com/pmd/pmd/issues/282): \[java] UnnecessaryLocalBeforeReturn false positive when cloning Maps
+    *   [#291](https://github.com/pmd/pmd/issues/291): \[java] Improve quality of AccessorClassGeneration
 *   java-imports
     *   [#1546](https://sourceforge.net/p/pmd/bugs/1546/): \[java] UnnecessaryFullyQualifiedNameRule doesn't take into consideration conflict resolution
     *   [#1547](https://sourceforge.net/p/pmd/bugs/1547/): \[java] UnusedImportRule - False Positive for only usage in Javadoc - {@link ClassName#CONSTANT}
     *   [#1555](https://sourceforge.net/p/pmd/bugs/1555/): \[java] UnnecessaryFullyQualifiedName: Really necessary fully qualified name
+*   java-junit
+    *   [#285](https://github.com/pmd/pmd/issues/285): \[java] JUnitTestsShouldIncludeAssertRule should support @Rule as well as @Test(expected = ...)
 *   java-logging-java
     *   [#1541](https://sourceforge.net/p/pmd/bugs/1541/): \[java] InvalidSlf4jMessageFormat: False positive with placeholder and exception
     *   [#1551](https://sourceforge.net/p/pmd/bugs/1551/): \[java] InvalidSlf4jMessageFormat: fails with NPE
 *   java-optimizations
     *   [#215](https://github.com/pmd/pmd/issues/215): \[java] RedundantFieldInitializer report for annotation field not explicitly marked as final
+    *   [#222](https://github.com/pmd/pmd/issues/222): \[java] UseStringBufferForStringAppends: False Positive with ternary operator
 *   java-strings
     *   [#202](https://github.com/pmd/pmd/issues/202): \[java] \[doc] ConsecutiveAppendsShouldReuse is not really an optimization
+    *   [#290](https://github.com/pmd/pmd/issues/290): \[java] InefficientEmptyStringCheck misses String.trim().isEmpty()
 *   java-unnecessary
     *   [#199](https://github.com/pmd/pmd/issues/199): \[java] UselessParentheses: Parentheses in return statement are incorrectly reported as useless
 *   java-unusedcode
@@ -515,4 +548,12 @@ For example:
 *   [#281](https://github.com/pmd/pmd/pull/281): \[apex] Add Braces Rule Set
 *   [#283](https://github.com/pmd/pmd/pull/283): \[vf] CSRF in VF controller pages
 *   [#284](https://github.com/pmd/pmd/pull/284): \[vf] Adding support for parsing EL in script tags
+*   [#287](https://github.com/pmd/pmd/pull/287): \[apex] Make Rule suppression work
+*   [#288](https://github.com/pmd/pmd/pull/288): \[vf] Setting the tab size to 4 for VF
+*   [#289](https://github.com/pmd/pmd/pull/289): \[apex] Complex SOQL Crud check bug fixes
+*   [#296](https://github.com/pmd/pmd/pull/296): \[apex] Adding String.IsNotBlank to the whitelist to prevent False positives
+*   [#297](https://github.com/pmd/pmd/pull/297): \[core] CPD: Adding the --filelist option from pmd to cpd
+*   [#303](https://github.com/pmd/pmd/pull/303): \[java] InefficientEmptyStringCheckRule now reports String.trim().isEmpty() 
+*   [#307](https://github.com/pmd/pmd/pull/307): \[java] Fix false positive with UseStringBufferForStringAppendsRule
+*   [#308](https://github.com/pmd/pmd/pull/308): \[java] JUnitTestsShouldIncludeAssertRule supports @Rule annotated ExpectedExceptions
 
