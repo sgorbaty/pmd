@@ -1,7 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <test-data>
+	<test-code>
+		<description><![CDATA[
+apex:iframe with src pointing to VFEL
+     ]]></description>
+		<expected-problems>1</expected-problems>
+		<code><![CDATA[
+<apex:page>
+<apex:iframe src="{!iframeSource}" />
+</apex:page>
+]]></code>
+		<source-type>vf</source-type>
+	</test-code>
 
-<test-code>
+	<test-code>
+		<description><![CDATA[
+html iframe with src pointing to VFEL
+     ]]></description>
+		<expected-problems>1</expected-problems>
+		<code><![CDATA[
+<apex:page>
+<iframe src="{!iframeSource}" />
+</apex:page>
+]]></code>
+		<source-type>vf</source-type>
+	</test-code>
+
+	<test-code>
+		<description><![CDATA[
+html link with src pointing to VFEL
+     ]]></description>
+		<expected-problems>1</expected-problems>
+		<code><![CDATA[
+<apex:page>
+	<a src="{!iframeSource}">Link me</a>
+</apex:page>
+]]></code>
+		<source-type>vf</source-type>
+	</test-code>
+
+	<test-code>
 		<description><![CDATA[
 Safe escaped value in repeat
      ]]></description>
@@ -16,10 +54,10 @@ Safe escaped value in repeat
 </apex:page>
 ]]></code>
 		<source-type>vf</source-type>
-	</test-code> 
+	</test-code>
 
 
-<test-code>
+	<test-code>
 		<description><![CDATA[
 Safe escaped value in repeat
      ]]></description>
@@ -35,11 +73,11 @@ Safe escaped value in repeat
 </apex:page>
 ]]></code>
 		<source-type>vf</source-type>
-	</test-code> 
+	</test-code>
 
 
 
-<test-code>
+	<test-code>
 		<description><![CDATA[
 Safe case id in script
      ]]></description>
@@ -52,10 +90,55 @@ Safe case id in script
 </apex:page>
 ]]></code>
 		<source-type>vf</source-type>
-	</test-code> 
+	</test-code>
 
 
- 	<test-code>
+	<test-code>
+		<description><![CDATA[
+Safely escaped case in script context
+     ]]></description>
+		<expected-problems>0</expected-problems>
+		<code><![CDATA[
+<apex:page>
+	<script>
+	window.parent.opener.location.href = '{!JSINHTMLENCODE(case)}';
+	</script>
+</apex:page>
+]]></code>
+		<source-type>vf</source-type>
+	</test-code>
+
+
+
+	<test-code>
+		<description><![CDATA[
+Id in the EL means no XSS
+     ]]></description>
+		<expected-problems>0</expected-problems>
+		<code><![CDATA[
+<apex:page>
+<a onclick="ShowUnregisterWindow('{!item.id}')">foo</a>
+ </apex:page>
+]]></code>
+		<source-type>vf</source-type>
+	</test-code>
+
+	<test-code>
+		<description><![CDATA[
+		User Id is safe
+     ]]></description>
+		<expected-problems>0</expected-problems>
+		<code><![CDATA[
+<apex:page>
+	<script>
+		$Lightning.createComponent("c:RE_TasksListComp",{"loginUserId":"{!$User.Id}"});
+	</script>
+</apex:page>
+]]></code>
+		<source-type>vf</source-type>
+	</test-code>
+
+	<test-code>
 		<description><![CDATA[
 No XSS in safe script commands quoted context
      ]]></description>
@@ -68,8 +151,8 @@ No XSS in safe script commands quoted context
 </apex:page>
 ]]></code>
 		<source-type>vf</source-type>
-	</test-code> 
- 	<test-code>
+	</test-code>
+	<test-code>
 		<description><![CDATA[
 Unquoted EL in script tag is an XSS 
      ]]></description>
@@ -82,7 +165,7 @@ Unquoted EL in script tag is an XSS
 </apex:page>
 ]]></code>
 		<source-type>vf</source-type>
-	</test-code> 
+	</test-code>
 
 	<test-code>
 		<description><![CDATA[
@@ -152,19 +235,6 @@ Starts with Resource
 <apex:page>
 <link rel="stylesheet" type="text/css" href="{!$Resource.SDEFExtJS}/resources/css/ext-all.css" id="ext-all-css"/>
 </apex:page>
-]]></code>
-		<source-type>vf</source-type>
-	</test-code>
-
-	<test-code>
-		<description><![CDATA[
-Id in the EL means no XSS
-     ]]></description>
-		<expected-problems>0</expected-problems>
-		<code><![CDATA[
-<apex:page>
-<a onclick="ShowUnregisterWindow('{!item.id}')">foo</a>
- </apex:page>
 ]]></code>
 		<source-type>vf</source-type>
 	</test-code>
@@ -442,4 +512,4 @@ No XSS with escaped EL
 ]]></code>
 		<source-type>vf</source-type>
 	</test-code>
- </test-data>
+</test-data>

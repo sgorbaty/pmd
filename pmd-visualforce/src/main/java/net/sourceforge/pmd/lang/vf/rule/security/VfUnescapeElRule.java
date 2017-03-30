@@ -29,6 +29,9 @@ import net.sourceforge.pmd.lang.vf.rule.AbstractVfRule;
  *
  */
 public class VfUnescapeElRule extends AbstractVfRule {
+    private static final String A_CONST = "a";
+    private static final String APEXIFRAME_CONST = "apex:iframe";
+    private static final String IFRAME_CONST = "iframe";
     private static final String HREF = "href";
     private static final String SRC = "src";
     private static final String APEX_PARAM = "apex:param";
@@ -80,7 +83,8 @@ public class VfUnescapeElRule extends AbstractVfRule {
         if (quoted) {
             // check escaping too
             if (!(startsWithSafeResource(elExpression) || containsSafeFields(elExpression))) {
-                if (doesElContainAnyUnescapedIdentifiers(elExpression, Escaping.JSENCODE)) {
+                if (doesElContainAnyUnescapedIdentifiers(elExpression,
+                        EnumSet.of(Escaping.JSENCODE, Escaping.JSINHTMLENCODE))) {
                     addViolation(data, elExpression);
                 }
             }
@@ -125,8 +129,9 @@ public class VfUnescapeElRule extends AbstractVfRule {
 
     private void checkLimitedFlags(ASTElement node, Object data) {
         switch (node.getName().toLowerCase()) {
-        case "iframe":
-        case "a":
+        case IFRAME_CONST:
+        case APEXIFRAME_CONST:
+        case A_CONST:
             break;
         default:
             return;
@@ -339,7 +344,7 @@ public class VfUnescapeElRule extends AbstractVfRule {
         final List<ASTExpression> exprs = elExpression.findChildrenOfType(ASTExpression.class);
         for (final ASTExpression expr : exprs) {
 
-            if (containsSafeFields(expr)) {
+            if (innerContainsSafeFields(expr)) {
                 continue;
             }
 
@@ -377,7 +382,13 @@ public class VfUnescapeElRule extends AbstractVfRule {
     }
 
     private boolean containsSafeFields(final AbstractVFNode expression) {
+        final ASTExpression ex = expression.getFirstChildOfType(ASTExpression.class);
 
+        return ex == null ? false : innerContainsSafeFields(ex);
+
+    }
+
+    private boolean innerContainsSafeFields(final AbstractVFNode expression) {
         for (int i = 0; i < expression.jjtGetNumChildren(); i++) {
             Node child = expression.jjtGetChild(i);
 
@@ -392,7 +403,7 @@ public class VfUnescapeElRule extends AbstractVfRule {
             }
 
             if (child instanceof ASTDotExpression) {
-                if (containsSafeFields((ASTDotExpression) child)) {
+                if (innerContainsSafeFields((ASTDotExpression) child)) {
                     return true;
                 }
             }
