@@ -151,8 +151,7 @@ public class VfDocStyleTest extends AbstractVfNodesTest {
         ASTText text = script.getFirstChildOfType(ASTText.class);
         assertEquals("Correct script content expected!", "Script!", text.getImage());
     }
-    
-    
+
     /**
      * Test parsing of EL in HTML &lt;script&gt; element.
      */
@@ -167,7 +166,7 @@ public class VfDocStyleTest extends AbstractVfNodesTest {
         ASTIdentifier id = el.getFirstDescendantOfType(ASTIdentifier.class);
         assertEquals("Correct EL content expected!", "elInScript", id.getImage());
     }
-    
+
     /**
      * Test parsing of quoted EL in HTML &lt;script&gt; element.
      */
@@ -177,7 +176,7 @@ public class VfDocStyleTest extends AbstractVfNodesTest {
         assertEquals("One script expected!", 1, scripts.size());
         ASTHtmlScript script = scripts.iterator().next();
         ASTText text = script.getFirstChildOfType(ASTText.class);
-        assertEquals("Correct script content expected!", "vartext='textHere", text.getImage());        
+        assertEquals("Correct script content expected!", "vartext='textHere", text.getImage());
         ASTElExpression el = script.getFirstChildOfType(ASTElExpression.class);
         ASTIdentifier id = el.getFirstDescendantOfType(ASTIdentifier.class);
         assertEquals("Correct EL content expected!", "elInScript", id.getImage());
@@ -234,9 +233,7 @@ public class VfDocStyleTest extends AbstractVfNodesTest {
     @Test
     public void testInlineCss() {
         Set<ASTElement> elements = getNodes(ASTElement.class, TEST_INLINE_STYLE);
-        Set<ASTHtmlStyle> styles = getNodes(ASTHtmlStyle.class, TEST_INLINE_STYLE);
-        assertEquals("Two elements expected!", 2, elements.size());
-        assertEquals("One style expected!", 1, styles.size());
+        assertEquals("Two elements expected!", 3, elements.size());
     }
 
     /**
@@ -636,7 +633,7 @@ public class VfDocStyleTest extends AbstractVfNodesTest {
         assertEquals("One attribute expected!", 1, attributes.size());
         Iterator<ASTAttributeValue> iterator = attributes.iterator();
         ASTAttributeValue attr = iterator.next();
-        ASTIdentifier id = attr.getFirstDescendantOfType(ASTIdentifier.class);        
+        ASTIdentifier id = attr.getFirstDescendantOfType(ASTIdentifier.class);
         assertEquals("Expected to detect proper value for EL in attribute!", "something", id.getImage());
     }
 
