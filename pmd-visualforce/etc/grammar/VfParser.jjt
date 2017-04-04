@@ -137,7 +137,7 @@ PARSER_END(VfParser)
 	| <MULEQ: "*=" >
 	| <MUL: "*" >
 	| <PERCENT: "%">
-	| <DOUBLE_EQ: "==" >
+	| <DOUBLE_EQ: ("=="|"eq") >
 	| <EQ: "=" >
 	| <NOT_EQ: ("<>" | "!=" ) >
 	| <LE: "<=" >
