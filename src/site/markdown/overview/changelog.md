@@ -463,11 +463,14 @@ You need to use this, if you have a large project with many files, and you hit t
     *   [#282](https://github.com/pmd/pmd/issues/282): \[java] UnnecessaryLocalBeforeReturn false positive when cloning Maps
     *   [#291](https://github.com/pmd/pmd/issues/291): \[java] Improve quality of AccessorClassGeneration
 *   java-imports
+    *   [#338](https://github.com/pmd/pmd/issues/338): \[java] False positive on DontImportJavaLang when importing java.lang.ProcessBuilder
+    *   [#339](https://github.com/pmd/pmd/issues/339): \[java] False positive on DontImportJavaLang when importing Java 7's java.lang.invoke.MethodHandles
     *   [#1546](https://sourceforge.net/p/pmd/bugs/1546/): \[java] UnnecessaryFullyQualifiedNameRule doesn't take into consideration conflict resolution
     *   [#1547](https://sourceforge.net/p/pmd/bugs/1547/): \[java] UnusedImportRule - False Positive for only usage in Javadoc - {@link ClassName#CONSTANT}
     *   [#1555](https://sourceforge.net/p/pmd/bugs/1555/): \[java] UnnecessaryFullyQualifiedName: Really necessary fully qualified name
 *   java-junit
     *   [#285](https://github.com/pmd/pmd/issues/285): \[java] JUnitTestsShouldIncludeAssertRule should support @Rule as well as @Test(expected = ...)
+    *   [#330](https://github.com/pmd/pmd/issues/330): \[java] NPE applying rule JUnitTestsShouldIncludeAssert
 *   java-logging-java
     *   [#1541](https://sourceforge.net/p/pmd/bugs/1541/): \[java] InvalidSlf4jMessageFormat: False positive with placeholder and exception
     *   [#1551](https://sourceforge.net/p/pmd/bugs/1551/): \[java] InvalidSlf4jMessageFormat: fails with NPE
@@ -560,4 +563,8 @@ You need to use this, if you have a large project with many files, and you hit t
 *   [#314](https://github.com/pmd/pmd/pull/314): \[vf] Bug fixes for incorrect Id detection and escaping
 *   [#316](https://github.com/pmd/pmd/pull/316): \[apex] Ignoring certain rules in Batch classes, Queueable, and install scripts
 *   [#317](https://github.com/pmd/pmd/pull/317): \[apex] Add support for safe ID assignment from URL param
+*   [#326](https://github.com/pmd/pmd/pull/326): \[vf] Quote detection improvement and method argument detection
+*   [#327](https://github.com/pmd/pmd/pull/327): \[apex] Fixed SOQL injection detection for escaped vars
+*   [#331](https://github.com/pmd/pmd/pull/331): \[java] JunitTestsShouldIncludeAssertRule now handles AllocationExpression correctly
+*   [#332](https://github.com/pmd/pmd/pull/332): \[java] Future-proof DontImportJavaLangRule
 
