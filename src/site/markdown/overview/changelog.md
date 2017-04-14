@@ -20,7 +20,7 @@ than a 50% speedup). Future releases will keep improving on this area.
 Once again, *Symbol Table* has been an area of great performance improvements.
 This time we were able to further improve it's performance by roughly 10% on all
 supported languages. In *Java* in particular, several more improvements were possible,
-improving *Symbol Table* performance by a whooping 30%, that's over 5X faster
+improving *Symbol Table* performance by a whooping 80%, that's over 15X faster
 than PMD 5.5.1, when we first started working on it.
 
 Java developers will also appreciate the revamp of `CloneMethodMustImplementCloneable`,
@@ -33,7 +33,6 @@ making it over 500X faster, and `PreserveStackTrace` which is now 7X faster.
     *   [Visualforce Support](#Visualforce_support)
     *   [Apex Security Rule Set](#Apex_Security_Rule_Set)
     *   [Apex Braces Rule Set](#Apex_Braces_Rule_Set)
-    *   [Apex Rule Suppression](#Apex_Rule_Suppression)
     *   [New Rules](#New_Rules)
     *   [Modified Rules](#Modified_Rules)
     *   [CPD Suppression](#CPD_Suppression)
@@ -316,22 +315,6 @@ for (int i = 0; i < 42; i++) { // preferred approach
 }
 ```
 
-#### Apex Rule Suppression
-
-Apex violations can now be suppressed very similarly to how it's done in Java, by making use of a
-`@SuppressWarnings` annotation.
-
-Supported syntax includes:
-
-```
-@SupressWarnings('PMD') // to supress all Apex rules
-@SupressWarnings('all') // to supress all Apex rules
-@SupressWarnings('PMD.ARuleName') // to supress only the rule named ARuleName
-@SupressWarnings('PMD.ARuleName, PMD.AnotherRuleName') // to supress only the rule named ARuleName or AnotherRuleName
-```
-
-Notice this last scenario is slightly different to the Java syntax. This is due to differences in the Apex grammar for annotations.
-
 #### New Rules
 
 ##### AccessorMethodGeneration (java-design)
@@ -375,7 +358,9 @@ This new rule is part of the `java-design` ruleset.
 *   The rule `AvoidConstantsInterface` (ruleset java-design) has been removed. It is completely replaced by
     the rule `ConstantsInInterface`.
 
-*   The Java rule `UnusedModifier` (ruleset java-unusedcode) has been expanded to consider more redundant modifiers.
+*   The Java rule `UnusedModifier` (ruleset java-unusedcode) has been moved to the ruleset java-unnecessary
+    and has been renamed to `UnnecessaryModifier`.
+    Additionally, it has been expanded to consider more redundant modifiers:
     *   Annotations marked as `abstract`.
     *   Nested annotations marked as `static`.
     *   Nested annotations within another interface or annotation marked as `public`.
@@ -426,6 +411,8 @@ You need to use this, if you have a large project with many files, and you hit t
     *   [#234](https://github.com/pmd/pmd/issues/234): \[core] Zip file stream closes spuriously when loading rulesets
     *   [#256](https://github.com/pmd/pmd/issues/256): \[core] shortnames option is broken with relative paths
     *   [#305](https://github.com/pmd/pmd/issues/305): \[core] PMD not executing under git bash
+    *   [#324](https://github.com/pmd/pmd/issues/324): \[core] Automated release - github release notes missing
+    *   [#337](https://github.com/pmd/pmd/issues/337): \[core] Version 5.5.4 seems to hold file lock on rules JAR (affects Windows only)
 *   apex-apexunit
     *   [#1543](https://sourceforge.net/p/pmd/bugs/1543/): \[apex] ApexUnitTestClassShouldHaveAsserts assumes APEX is case sensitive
 *   apex-complexity
@@ -433,6 +420,7 @@ You need to use this, if you have a large project with many files, and you hit t
     *   [#251](https://github.com/pmd/pmd/issues/251): \[apex] NCSS Type length is incorrect when using method chaining
 *   apex-security
     *   [#264](https://github.com/pmd/pmd/issues/264): \[apex] ApexXSSFromURLParamRule shouldn't enforce ESAPI usage. String.escapeHtml4 is sufficient.
+    *   [#315](https://github.com/pmd/pmd/issues/315): \[apex] Documentation flaw on Apex Sharing Violations
 *   java
     *   [#185](https://github.com/pmd/pmd/issues/185): \[java] CPD runs into NPE when analyzing Lucene
     *   [#206](https://github.com/pmd/pmd/issues/206): \[java] Parse error on annotation fields with generics
@@ -551,7 +539,6 @@ You need to use this, if you have a large project with many files, and you hit t
 *   [#281](https://github.com/pmd/pmd/pull/281): \[apex] Add Braces Rule Set
 *   [#283](https://github.com/pmd/pmd/pull/283): \[vf] CSRF in VF controller pages
 *   [#284](https://github.com/pmd/pmd/pull/284): \[vf] Adding support for parsing EL in script tags
-*   [#287](https://github.com/pmd/pmd/pull/287): \[apex] Make Rule suppression work
 *   [#288](https://github.com/pmd/pmd/pull/288): \[vf] Setting the tab size to 4 for VF
 *   [#289](https://github.com/pmd/pmd/pull/289): \[apex] Complex SOQL Crud check bug fixes
 *   [#296](https://github.com/pmd/pmd/pull/296): \[apex] Adding String.IsNotBlank to the whitelist to prevent False positives
@@ -567,4 +554,7 @@ You need to use this, if you have a large project with many files, and you hit t
 *   [#327](https://github.com/pmd/pmd/pull/327): \[apex] Fixed SOQL injection detection for escaped vars
 *   [#331](https://github.com/pmd/pmd/pull/331): \[java] JunitTestsShouldIncludeAssertRule now handles AllocationExpression correctly
 *   [#332](https://github.com/pmd/pmd/pull/332): \[java] Future-proof DontImportJavaLangRule
+*   [#340](https://github.com/pmd/pmd/pull/340): \[vf] Multiple parser bug fixes
+*   [#341](https://github.com/pmd/pmd/pull/341): \[vf] JSON.parse(..) and NOT(..) are safely evaluated
+*   [#343](https://github.com/pmd/pmd/pull/343): \[apex] int,id,boolean,ternary operator condition are not injection in Soql
 
